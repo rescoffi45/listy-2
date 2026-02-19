@@ -93,7 +93,7 @@ const AddCategoryDialog: React.FC<{ onClose: () => void; onAdd: (cat: CategoryDe
   );
 };
 
-// --- Mobile Dashboard (Grid View) ---
+// --- Mobile Dashboard ---
 const DashboardMobile: React.FC<{ 
   categories: CategoryDef[],
   counts: Record<string, number>, 
@@ -144,7 +144,7 @@ const DashboardMobile: React.FC<{
   );
 };
 
-// --- Desktop Sidebar (List View) ---
+// --- Desktop Sidebar ---
 const SidebarDesktop: React.FC<{
   categories: CategoryDef[],
   counts: Record<string, number>,
@@ -155,7 +155,6 @@ const SidebarDesktop: React.FC<{
 }> = ({ categories, counts, selectedCategory, onCategorySelect, onCategoryContext, onAddCategory }) => {
   return (
     <div className="w-full h-full flex flex-col bg-gray-50/50 backdrop-blur-xl">
-      {/* Sidebar Header */}
       <div className="h-14 flex items-center justify-between px-4">
          <button className="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors"><Layout size={20} /></button>
          <button className="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors"><Settings size={20} /></button>
@@ -176,8 +175,6 @@ const SidebarDesktop: React.FC<{
                 <span className={`text-[15px] font-medium truncate ${isSelected ? 'text-blue-600' : 'text-gray-900'}`}>{cat.label}</span>
               </div>
               <span className={`text-sm ${isSelected ? 'text-blue-500' : 'text-gray-400'}`}>{counts[cat.type] || 0}</span>
-              
-              {/* Hover Menu Trigger */}
               <button 
                  onClick={(e) => { e.stopPropagation(); onCategoryContext(cat); }}
                  className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 hover:text-gray-800 absolute right-12 transition-opacity"
@@ -189,7 +186,6 @@ const SidebarDesktop: React.FC<{
         })}
       </div>
 
-      {/* Sidebar Footer Add */}
       <div className="p-4">
         <button 
            onClick={onAddCategory}
@@ -205,7 +201,7 @@ const SidebarDesktop: React.FC<{
   );
 };
 
-// --- Shared Category View ---
+// --- Shared Category View (CORRIGÉ) ---
 const CategoryView: React.FC<{
   category: CategoryDef;
   items: Item[];
@@ -214,7 +210,6 @@ const CategoryView: React.FC<{
   onItemClick: (item: Item) => void;
   onAddItem: () => void;
 }> = ({ category, items, isDesktop, onBack, onItemClick, onAddItem }) => {
-  // Determine layout based on category
   const isPosterLayout = [
     CategoryType.Movies, 
     CategoryType.TVShows, 
@@ -224,66 +219,53 @@ const CategoryView: React.FC<{
     CategoryType.Wines
   ].includes(category.type as any);
 
-  // Padding classes for alignment
-  const containerPadding = isDesktop ? "px-6" : "px-4";
-  const titlePadding = isDesktop ? "px-6" : "px-6";
+  const containerPadding = isDesktop ? "px-8" : "px-4";
 
   return (
-    <div className={`h-full bg-white flex flex-col relative overflow-hidden`}>
-      {/* Header */}
-      <div className="flex-shrink-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 h-14 relative w-full">
-        {/* Navigation / Back Button Area */}
-        <div className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center">
+    <div className="h-full bg-white flex flex-col relative overflow-hidden">
+      {/* Header Fixé en haut avec barre de recherche à droite */}
+      <header className="flex-shrink-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 h-16 w-full flex items-center justify-between px-4">
+        <div className="flex items-center">
            {!isDesktop && (
-              <button onClick={onBack} className="flex items-center text-blue-500 text-lg font-medium -ml-1 pr-2">
+              <button onClick={onBack} className="flex items-center text-blue-500 text-lg font-medium pr-2">
                 <ChevronLeft className="h-7 w-7" />
                 Back
               </button>
            )}
+           {isDesktop && <span className="text-gray-400 font-medium text-sm ml-2">{category.label}</span>}
         </div>
         
-        {/* Header Controls (Search & Dots) - Absolute relative to header to avoid viewport shift */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-4 text-blue-500">
-           {isDesktop && (
-              <div className="relative group mr-2">
-                  <Search className="text-gray-400 w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                  <input 
-                    type="text" 
-                    placeholder="Search" 
-                    className="pl-9 pr-4 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 w-40 transition-all focus:w-60"
-                  />
-              </div>
-           )}
-           <button className="hover:bg-blue-50 p-1.5 rounded-lg transition-colors flex items-center justify-center">
-              <MoreHorizontal className="h-6 w-6" />
-           </button>
-           {!isDesktop && (
-             <button className="hover:bg-blue-50 p-1.5 rounded-lg transition-colors flex items-center justify-center">
-               <ArrowUpDown className="h-6 w-6" />
-             </button>
-           )}
+        {/* Barre de recherche et options TOUJOURS à droite */}
+        <div className="flex items-center gap-3">
+          <div className="relative group">
+            <Search className="text-gray-400 w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input 
+              type="text" 
+              placeholder="Search..." 
+              className="pl-9 pr-4 py-1.5 bg-gray-100 rounded-full text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 w-32 md:w-48 lg:w-64 transition-all focus:bg-gray-200/50"
+            />
+          </div>
+          <div className="flex items-center gap-1 border-l pl-2 ml-1">
+            {!isDesktop && (
+              <button className="text-blue-500 hover:bg-blue-50 p-2 rounded-full transition-colors">
+                <ArrowUpDown className="h-5 w-5" />
+              </button>
+            )}
+            <button className="text-blue-500 hover:bg-blue-50 p-2 rounded-full transition-colors">
+              <MoreHorizontal className="h-5 w-5" />
+            </button>
+          </div>
         </div>
-      </div>
+      </header>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar">
-         {/* Title Area */}
-         <div className={`${titlePadding} pt-6 pb-6`}>
-           <h1 className="text-4xl font-bold text-gray-900 tracking-tight mb-4">{category.label}</h1>
-           {!isDesktop && (
-             <div className="relative">
-               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                 <Search className="h-5 w-5 text-gray-400" />
-               </div>
-               <input
-                 type="text"
-                 className="block w-full pl-10 pr-3 py-2 border-none rounded-xl bg-gray-100 text-gray-900 placeholder-gray-500 focus:outline-none text-lg"
-                 placeholder="Search"
-               />
-             </div>
-           )}
+         {/* Title Area (Plus de barre de recherche ici) */}
+         <div className={`${containerPadding} pt-8 pb-6`}>
+           <h1 className="text-4xl font-bold text-gray-900 tracking-tight">{category.label}</h1>
+           <p className="text-gray-500 text-sm mt-1 font-medium">{items.length} items</p>
          </div>
 
-         {/* Grid */}
+         {/* Grid Content */}
          <div className={`${containerPadding} pb-32 ${isPosterLayout 
             ? 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-6 gap-y-10' 
             : 'grid grid-cols-1 gap-3'}`
@@ -292,7 +274,7 @@ const CategoryView: React.FC<{
              <div 
                key={item.id} 
                onClick={() => onItemClick(item)}
-               className={`relative group cursor-pointer transition-transform active:scale-95`}
+               className="relative group cursor-pointer transition-transform active:scale-95"
              >
                 {isPosterLayout ? (
                   <div className="flex flex-col h-full">
@@ -310,9 +292,7 @@ const CategoryView: React.FC<{
                        )}
                      </div>
                      <h3 className="mt-3 text-[13px] font-semibold text-gray-900 leading-tight line-clamp-2">{item.title}</h3>
-                     <div className="flex items-center mt-1 space-x-1">
-                       <span className="text-[12px] text-gray-500">{item.subtitle}</span>
-                     </div>
+                     <span className="text-[12px] text-gray-500 mt-1">{item.subtitle}</span>
                   </div>
                 ) : (
                   <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
@@ -330,7 +310,6 @@ const CategoryView: React.FC<{
          </div>
       </div>
 
-      {/* Floating Add Button */}
       <button 
         onClick={onAddItem}
         className="fixed bottom-8 right-8 w-14 h-14 bg-blue-500 rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center text-white hover:bg-blue-600 active:scale-90 transition-all z-40"
@@ -340,7 +319,6 @@ const CategoryView: React.FC<{
     </div>
   );
 };
-
 
 // --- Main App ---
 
@@ -353,24 +331,19 @@ export default function App() {
   } = useStore();
 
   const [currentCategory, setCurrentCategory] = useState<CategoryDef | null>(null);
-  
-  // Context Menus
   const [contextItem, setContextItem] = useState<Item | null>(null);
   const [contextCategory, setContextCategory] = useState<CategoryDef | null>(null);
-  
-  // Dialogs
   const [isAddingItem, setIsAddingItem] = useState(false);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
 
   const counts = getCounts();
 
-  // Set default category on desktop if none selected
   useEffect(() => {
     if (window.innerWidth >= 768 && !currentCategory && categories.length > 0) {
       setCurrentCategory(categories[0]);
     }
-  }, [categories]); // Only run when categories change initially
+  }, [categories]);
 
   const handleAction = (action: string, target: any) => {
     if (contextItem) {
@@ -413,7 +386,7 @@ export default function App() {
   return (
     <div className="flex h-screen w-full bg-white text-gray-900 overflow-hidden font-sans">
       
-      {/* --- Mobile View (< 768px) --- */}
+      {/* Mobile View */}
       <div className="md:hidden flex-1 h-full relative">
          {!currentCategory ? (
             <DashboardMobile 
@@ -435,9 +408,7 @@ export default function App() {
          )}
       </div>
 
-      {/* --- Desktop View (>= 768px) --- */}
-      
-      {/* Sidebar */}
+      {/* Desktop View */}
       <aside className="hidden md:flex w-[260px] lg:w-[300px] flex-shrink-0 border-r border-gray-200 z-10">
          <SidebarDesktop 
             categories={categories}
@@ -449,7 +420,6 @@ export default function App() {
          />
       </aside>
 
-      {/* Main Content Area */}
       <main className="hidden md:flex flex-1 h-full relative bg-white">
         {currentCategory ? (
            <CategoryView 
@@ -471,9 +441,7 @@ export default function App() {
         )}
       </main>
 
-
-      {/* --- Overlays --- */}
-
+      {/* Overlays */}
       {contextItem && (
         <ContextMenu 
           type="item"
